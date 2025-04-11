@@ -59,9 +59,8 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm:ss");
         String formatTanggalKadaluarsa = tokenBaru.getTanggalKadaluarsa().format(formatter);
 
-        emailService.kirimEmail(user.getEmail(), "OTP Reset Password",
-                "OTP Anda Untuk Mereset Password Adalah : " + otp + "\nOTP Ini Akan Kadaluarsa Pada : "
-                        + formatTanggalKadaluarsa);
+        emailService.kirimOtpEmail(user.getEmail(), "OTP Reset Password", otp, formatTanggalKadaluarsa,
+                user.getUsername());
     }
 
     @Override
@@ -73,6 +72,10 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
         if (!PasswordUtil.check(request.getPasswordLama(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password Lama Yang Anda Masukkan Salah");
         }
+        if (PasswordUtil.check(request.getPasswordBaru(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password Yang Baru Tidak Boleh Sama Dengan Password Yang Lama");
+        }
 
         user.setPassword(PasswordUtil.hash(request.getPasswordBaru()));
         userRepository.save(user);
@@ -81,6 +84,8 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
     @Override
     public void validasiOtpDanResetPassword(OtpResetPasswordDto dto) {
 
+        User user = userRepository.findByUsername(dto.getUsername())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Tidak Ditemukan"));
 
         TokenResetPassword token = TokenResetPasswordRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP Tidak Ditemukan"));
@@ -93,8 +98,10 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP Yang Anda Masukkan Tidak Valid");
         }
 
-        User user = userRepository.findByUsername(dto.getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Tidak Ditemukan"));
+        if (PasswordUtil.check(dto.getPasswordBaru(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password Yang Baru Tidak Boleh Sama Dengan Password Yang Lama");
+        }
 
         user.setPassword(PasswordUtil.hash(dto.getPasswordBaru()));
         userRepository.save(user);
