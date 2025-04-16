@@ -40,10 +40,18 @@ public class JwtFilter extends OncePerRequestFilter {
             userKredensial.setUserId(Integer.valueOf(claims.getSubject()));
             userKredensial.setUsername(username);
 
+            // UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+            //         username,
+            //         userKredensial,
+            //         role.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     username,
                     userKredensial,
-                    role.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+                    role.stream()
+                            .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r) 
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
