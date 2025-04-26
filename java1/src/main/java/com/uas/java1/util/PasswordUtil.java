@@ -10,4 +10,29 @@ public class PasswordUtil {
     public static boolean check(String password, String hashed) {
         return BCrypt.checkpw(password, hashed);
     }
+
+    public static boolean validasiPassword(String username, String password) {
+        if (password == null || username == null)
+            return false;
+
+        if (password.equalsIgnoreCase(username)) {
+            return false;
+        }
+
+        if (password.length() < 8  || password.length() > 20) {
+            return false;
+        }
+
+        if (password.contains(" ")) {
+            return false;
+        }
+
+        String regexHuruf = ".*[a-zA-Z].*";
+        String regexAngka = ".*[0-9].*";
+        String regexKarakterAcak = ".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*";
+
+        return password.matches(regexHuruf)
+                && password.matches(regexAngka)
+                && password.matches(regexKarakterAcak);
+    }
 }

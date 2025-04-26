@@ -17,7 +17,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    
     @Autowired
     private TemplateEngine templateEngine;
 
@@ -37,8 +36,29 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Gagal Mengirimkan Email", e);
         }
     }
+
     @Override
-    public void kirimOtpEmail(String to, String subject, String otp, String expiredTime,String username) {
+    public void kirimNotifikasi(String email, String subjek, String isi) {
+
+        try {
+            Context context = new Context();
+            context.setVariable("isi", isi);
+            String htmlKonten = templateEngine.process("templates/template-notifikasi", context);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setPriority(1);
+            helper.setSubject(subjek);
+            helper.setText(htmlKonten, true);
+
+            mailSender.send(message);
+            // MimeMessage message = mailSender.createMimeMessa
+        } catch (Exception e) {
+            throw new RuntimeException("Gagal Mengirimkan Email", e);
+        }
+    }
+
+    @Override
+    public void kirimOtpEmail(String to, String subject, String otp, String expiredTime, String username) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);

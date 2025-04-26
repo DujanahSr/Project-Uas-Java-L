@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 public class UserDetailDto {
     private String username;
     private String role;
+    private String namaLengkap;
     private String aksesToken;
 }

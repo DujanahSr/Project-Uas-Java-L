@@ -1,5 +1,6 @@
 package com.uas.java1.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,14 +12,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uas.java1.dto.TaskDto;
 import com.uas.java1.model.Task;
 import com.uas.java1.model.TaskFile;
+import com.uas.java1.service.TaskFileExportService;
 import com.uas.java1.service.TaskFileService;
 import com.uas.java1.service.TaskService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,6 +33,7 @@ public class AdminTaskController {
 
     private final TaskService taskService;
     private final TaskFileService taskFileService;
+    private final TaskFileExportService taskFileExportService;
 
     @GetMapping
     public List<Task> getAllTasks() {
@@ -56,5 +61,9 @@ public class AdminTaskController {
         return taskFileService.getFilesByTaskId(taskId);
     }
 
-}
+    @GetMapping("/export-laporan-tugas")
+    public void exportLaporanTugas(@RequestParam int tahun, @RequestParam int bulan, HttpServletResponse response) throws IOException{
+        taskFileExportService.exportToExcellLaporan(tahun, bulan, response);
+    }
 
+}

@@ -40,6 +40,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "nama_lengkap",nullable = false,length = 90)
+    private String namaLengkap;
+
     @Column(nullable = false)
     private Boolean status;
 

@@ -33,6 +33,15 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
     @Override
     public void requestPasswordReset(LupaPasswordRequestDto request) {
 
+        if (request.getUsername() == null || request.getUsername().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semua Field Harus Diisi");
+        }
+
+        if (request.getUsername().length() < 3 || request.getUsername().length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Username Minimal 3 Karakter Dan Maksimal 20 Karakter");
+        }
+
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Pengguna Tidak Ditemukan"));
 
@@ -66,6 +75,16 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
     @Override
     public void resetPassword(ResetPasswordDto request) {
 
+        if (request.getUsername() == null || request.getUsername().isBlank()
+                || request.getPasswordLama() == null || request.getPasswordLama().isBlank()
+                || request.getPasswordBaru() == null || request.getPasswordBaru().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semua Field Harus Diisi");
+        }
+        if (request.getUsername().length() < 3 || request.getUsername().length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Username Minimal 3 Karakter Dan Maksimal 20 Karakter");
+        }
+
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Tidak Ditemukan"));
 
@@ -77,12 +96,33 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
                     "Password Yang Baru Tidak Boleh Sama Dengan Password Yang Lama");
         }
 
+        if (!PasswordUtil.validasiPassword(user.getUsername(), request.getPasswordBaru())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password tidak memenuhi kriteria yg valid, minimal 8 karakter, kombinasi huruf, angka, karakter khusus, tanpa spasi");
+        }
+
         user.setPassword(PasswordUtil.hash(request.getPasswordBaru()));
         userRepository.save(user);
     }
 
     @Override
     public void validasiOtpDanResetPassword(OtpResetPasswordDto dto) {
+
+        if (dto.getUsername() == null || dto.getUsername().isBlank()
+                || dto.getOtp() == null || dto.getOtp().isBlank()
+                || dto.getPasswordBaru() == null || dto.getPasswordBaru().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semua Field Harus Diisi");
+
+        }
+
+        if (dto.getUsername().length() < 3 || dto.getUsername().length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Username Minimal 3 Karakter Dan Maksimal 20 Karakter");
+        }
+
+        if (!dto.getOtp().matches("\\d{6}")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "OTP Hanya Terdiri Dari 6 Angka Saja");
+        }
 
         User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Tidak Ditemukan"));
@@ -101,6 +141,10 @@ public class LupaPasswordServiceImpl implements LupaPasswordService {
         if (PasswordUtil.check(dto.getPasswordBaru(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Password Yang Baru Tidak Boleh Sama Dengan Password Yang Lama");
+        }
+        if (!PasswordUtil.validasiPassword(user.getUsername(), dto.getPasswordBaru())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Password tidak memenuhi kriteria yg valid, minimal 8 karakter, kombinasi huruf, angka, karakter khusus, tanpa spasi");
         }
 
         user.setPassword(PasswordUtil.hash(dto.getPasswordBaru()));

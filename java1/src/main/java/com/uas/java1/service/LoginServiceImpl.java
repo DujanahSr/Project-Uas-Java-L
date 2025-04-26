@@ -27,9 +27,20 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public UserDetailDto login(LoginDto dto) {
 
+        if (dto.getUsername() == null || dto.getUsername().trim().isBlank()
+                || dto.getPassword() == null || dto.getPassword().trim().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Semua Field Harus Diisi");
+        }
+        
+        if (dto.getUsername().length() < 3 || dto.getUsername().length() > 20) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Username Minimal 3 Karakter Dan Maksimal 20 Karakter");
+        }
+        
         User user = userRepository.findByUsername(dto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "Username Atau Password Tidak Valid"));
+
 
         if (!PasswordUtil.check(dto.getPassword(), user.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username Atau Password Tidak Valid");
@@ -44,6 +55,7 @@ public class LoginServiceImpl implements LoginService {
         return UserDetailDto.builder()
                 .username(user.getUsername())
                 .role(String.join(",", role))
+                .namaLengkap(user.getNamaLengkap())
                 .aksesToken(aksesToken)
                 .build();
     }

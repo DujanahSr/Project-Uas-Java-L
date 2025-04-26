@@ -37,6 +37,7 @@ public class InitialDataLoader {
                     .username("admin")
                     .password(PasswordUtil.hash("admin123"))
                     .email("dujanahsr07@gmail.com")
+                    .namaLengkap("abu dujanah siregar")
                     .status(true)
                     .tanggalDibuat(LocalDate.now())
                     .tanggalPembaruan(LocalDate.now())
