@@ -35,41 +35,13 @@ Sistem ini dirancang untuk membantu admin dalam manajemen tugas dan karyawan dal
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
-- **Backend**: Spring Boot (Java)
-- **Security**: Spring Security (JWT, OTP Verification, Email Verification)
-- **Database**: MySQL / PostgreSQL
-- **Export Laporan**: Apache POI (Excel), iText PDF (PDF)
-- **Scheduler**: (Jika ada pengiriman otomatis reminder tugas)
-
----
-
-## ⚙️ Cara Menjalankan
-1. Clone repository:
-   ```bash
-   git clone [repo-url]
-   ```
-2. Konfigurasi file `application.properties`:
-   - Database connection
-   - Email sender settings
-   - JWT Secret
-
-3. Jalankan aplikasi:
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-4. Akses API melalui Postman atau integrasikan dengan frontend.
-
----
 
 ## 📄 Catatan Tambahan
-- Setiap user harus memverifikasi email untuk bisa login.
-- Reset password hanya bisa dilakukan setelah verifikasi OTP.
+- Setiap user harus memverifikasi username dan password untuk bisa login.
+- Lupa password hanya bisa dilakukan setelah verifikasi OTP.
 - Admin memiliki hak penuh untuk manajemen tugas.
 - User hanya bisa melihat dan mengumpulkan tugas mereka sendiri.
 
 ---
 
-Kalau kamu mau, saya juga bisa sekalian buatkan daftar **endpoint API**-nya untuk Auth, Task, dan Laporan supaya sekalian lengkap! Mau sekalian dibuatkan? 🚀  
-Mau juga sekalian dibikinin contoh struktur folder project-nya? 📁
+
